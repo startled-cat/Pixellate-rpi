@@ -280,7 +280,7 @@ path {
     </ul>
     <div id="popup">
       <h3>Select the Dimensions Of the grid</h3>
-      <input type="text" id="width" value="16">X<input type="text" id="height" value="16">
+      <input type="text" id="width" value="32" disabled>X<input type="text" id="height" value="16" disabled>
       <button id="close">OK</button>
     </div>
     <div id="frames" onblur="Frames.close()" tabindex="0">
@@ -297,12 +297,12 @@ path {
       <span class="item" onclick="board.setmode(3)"><i class="fas fa-slash"></i></span>
       <span class="item" onclick="board.setmode(4)"><i class="far fa-circle"></i></span>
       <span class="item" onclick="board.setmode(5)"><i class="far fa-circle" style="transform: rotateX(45deg);"></i></span>
-      <span class="item" onclick="board.addFrame()"><i class="fas fa-plus"></i></span>
-      <span class="item" onclick="board.undo()"><i class="fas fa-undo"></i></span>
+      <span class="item" onclick="board.uploadImage()"><i class="fas fa-upload"></i></span>
+      <!-- <span class="item" onclick="board.undo()"><i class="fas fa-undo"></i></span>
       <span class="item" onclick="board.redo()"><i class="fas fa-redo"></i></span>
       <span class="item" onclick="board.clear()"><i class="fas fa-trash"></i></span>
       <span class="item" onclick="board.addImage()"><i class="fa fa-upload"></i></span>
-      <span class="item" onclick="Frames.open()"><i class="fas fa-eye"></i></span>
+      <span class="item" onclick="Frames.open()"><i class="fas fa-eye"></i></span> -->
     </div>
     <div id="palette"></div>
 </body>
@@ -333,10 +333,10 @@ class Canvas {
     this.w = +this.canvas.width;
     this.h = +this.canvas.height;
     this.ctx = this.canvas.getContext("2d");
-    this.ctx.fillStyle = "white";
+    this.ctx.fillStyle = "black";
     this.ctx.globalAlpha = 1;
     this.ctx.fillRect(0, 0, this.w, this.h);
-    this.data = [...Array(this.width)].map(e => Array(this.height).fill([255, 255, 255, 255]));
+    this.data = [...Array(this.width)].map(e => Array(this.height).fill([0, 0, 0, 255]));
     this.steps = [];
     this.redo_arr = [];
     this.frames = [];
@@ -351,7 +351,7 @@ class Canvas {
       } else if (tools[Tool.eraser]) {
         var temp = this.color;
         var tga = this.ctx.globalAlpha;
-        this.setcolor([255, 255, 255, 255]);
+        this.setcolor([0, 0, 0, 255]);
         this.draw(x, y);
         this.setcolor(temp);
         this.ctx.globalAlpha = tga;
@@ -429,7 +429,7 @@ class Canvas {
   erase(x, y){
     var temp = this.color;
     var tga = this.ctx.globalAlpha;
-    this.setcolor([255, 255, 255, 255]);
+    this.setcolor([0, 0, 0, 255]);
     this.draw(x, y);
     this.setcolor(temp);
     this.ctx.globalAlpha = tga;
@@ -458,48 +458,69 @@ class Canvas {
   }
 
   clear() {
-    this.ctx.fillStyle = "white";
+    console.log("clearing...")
+    this.ctx.fillStyle = "black";
     this.ctx.fillRect(0, 0, this.w, this.h);
-    this.data = [...Array(this.width)].map(e => Array(this.height).fill([255, 255, 255, 255]));
+    this.data = [...Array(this.width)].map(e => Array(this.height).fill([0, 0, 0, 255]));
     this.setcolor(this.color);
     this.setmode(Tool.pen);
   }
 
-  addFrame(data=null) {
+  uploadImage(data=null){
     var img = new Image();
     img.src = data || this.canvas.toDataURL();
-    this.frames.push([img,this.data.map(inner => inner.slice())]);
+    // convert to 1 and 0
+    function convertColor(rgba){
+      if((rgba[0]+rgba[1]+rgba[2]) >= (127*3)){
+        return 1
+      }else{
+        return 0
+      }
+    }
+
+    let output = this.data.map(line => line.map(convertColor))
+
+    output = output[0].map((_, colIndex) => output.map(row => row[colIndex]));
+    
+    console.log(JSON.stringify(output))
+
+  }
+
+  addFrame(data=null) {
+    // var img = new Image();
+    // img.src = data || this.canvas.toDataURL();
+    // this.frames.push([img,this.data.map(inner => inner.slice())]);
   }
 
   deleteFrame(f) {
-  	this.frames.splice(f,1);
+  	// this.frames.splice(f,1);
   }
 
   loadFrame(f) {
-  	this.clear();
-  	var img = this.frames[f][1];
-  	var tmp_color = this.color;
-  	var tmp_alpha = this.ctx.globalAlpha;
-  	this.ctx.globalAlpha = 1;
-  	var i,j;
-  	for (i=0; i<this.width; i++) {
-  		for (j=0; j<this.height; j++) {
-  			this.setcolor(img[i][j]);
-  			this.draw(i,j);
-  		}
-  	}
-  	this.setcolor(tmp_color);
-  	this.ctx.globalAlpha = tmp_alpha;
+  	// this.clear();
+  	// var img = this.frames[f][1];
+  	// var tmp_color = this.color;
+  	// var tmp_alpha = this.ctx.globalAlpha;
+  	// this.ctx.globalAlpha = 1;
+  	// var i,j;
+  	// for (i=0; i<this.width; i++) {
+  	// 	for (j=0; j<this.height; j++) {
+  	// 		this.setcolor(img[i][j]);
+  	// 		this.draw(i,j);
+  	// 	}
+  	// }
+  	// this.setcolor(tmp_color);
+  	// this.ctx.globalAlpha = tmp_alpha;
   }
 
   renderGIF() {
-  	this.frames.forEach(frame => {
-  		gif.addFrame(frame[0], {
-      		copy: true,
-      		delay: 100
-    	});
-  	});
-  	gif.render();
+  	// this.frames.forEach(frame => {
+  	// 	gif.addFrame(frame[0], {
+    //   		copy: true,
+    //   		delay: 100
+    // 	});
+  	// });
+  	// gif.render();
   }
 
   undo() {
@@ -697,26 +718,8 @@ function newProject(){
   localStorage.removeItem('pc-canvas-data');
   window.dim = new Popup("#popup");
   window.colors = [
-    [0, 0, 0, 255],
-    [127, 127, 127, 255],
-    [136, 0, 21, 255],
-    [237, 28, 36, 255],
-    [255, 127, 39, 255],
-    [255, 242, 0, 255],
-    [34, 177, 36, 255],
-    [0, 162, 232, 255],
-    [63, 72, 204, 255],
-    [163, 73, 164, 255],
     [255, 255, 255, 255],
-    [195, 195, 195, 255],
-    [185, 122, 87, 255],
-    [255, 174, 201, 255],
-    [255, 201, 14, 255],
-    [239, 228, 176, 255],
-    [181, 230, 29, 255],
-    [153, 217, 234, 255],
-    [112, 146, 190, 255],
-    [200, 191, 231, 255]
+    [0, 0, 0, 255],
   ];
 }
 function filler(x, y, cc) {
