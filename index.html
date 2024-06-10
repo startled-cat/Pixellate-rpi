@@ -467,6 +467,7 @@ class Canvas {
   }
 
   uploadImage(data=null){
+    console.log("uploading")
     var img = new Image();
     img.src = data || this.canvas.toDataURL();
     // convert to 1 and 0
@@ -482,9 +483,15 @@ class Canvas {
 
     output = output[0].map((_, colIndex) => output.map(row => row[colIndex]));
     
-    console.log(JSON.stringify(output))
+    console.log({output})
+
+    //uplaod
+    firebaseUpload(output)
 
   }
+
+  
+
 
   addFrame(data=null) {
     // var img = new Image();
@@ -632,6 +639,48 @@ class Frames {
   static close() {
     document.querySelector("#frames").style.transform = "translate(-50%,-50%) scale(0,0)";
   }
+}
+
+
+async function firebaseUpload(json_data) {
+  console.log("firebaseUpload")
+  console.log({json_data})
+  /**
+   * Executes a POST request to upload an image to Firebase Storage.
+   * DEMONSTRATION ONLY, USE NO FURTHER!
+   * args: None
+   * returns: response (json) with the response to the request
+   * usage: let res = await firebaseUpload();
+   */
+  let response = null;
+
+  // const file2upload = "/Your/Path/To/your_pic.png";
+  // const fs = require('fs');
+
+  // Read the file as a binary buffer
+  const fileBinary = JSON.stringify(json_data) //fs.readFileSync(file2upload);
+
+  // HTTP
+  const url2file = 'https://firebasestorage.googleapis.com/v0/b/oliwczak-lapmka.appspot.com/o/pic.json';
+  const headers = { "Content-Type": "application/json" };
+  console.log({fileBinary, url2file})
+
+  try {
+      const res = await fetch(url2file, {
+          method: 'POST',
+          headers: headers,
+          body: fileBinary
+      });
+
+      response = await res.json();
+      
+  } catch (error) {
+      console.error('Error uploading file:', error);
+  }
+
+  console.log({response})
+
+  return response;
 }
 
 window.onload = function () {
