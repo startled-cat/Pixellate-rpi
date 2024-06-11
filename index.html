@@ -112,7 +112,7 @@ body {
   max-width: 60px;
 }
 
-#close {
+#close, .popupBtn {
   background-color: #262327;
   color: white;
   margin: 15px auto 5px auto;
@@ -126,7 +126,7 @@ body {
   transition: 0.2s all;
 }
 
-#close:hover {
+#close:hover, .popupBtn:hover {
   box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.5);
 }
 
@@ -167,6 +167,14 @@ body {
   width: 32px;
   font-family: Arial, FontAwesome;
   font-size: 24px;
+}
+
+.uploadBtn{
+  color: rgb(255, 0, 211);
+}
+.uploadBtn:hover{
+  color: rgb(255, 97, 229);
+  background-color: rgba(255, 25, 236, 0.384) !important;
 }
 
 #palette {
@@ -282,6 +290,7 @@ path {
       <h3>Select the Dimensions Of the grid</h3>
       <input type="text" id="width" value="32" disabled>X<input type="text" id="height" value="16" disabled>
       <button id="close">OK</button>
+      <button id="cancel" class="popupBtn">Cancel</button>
     </div>
     <div id="frames" onblur="Frames.close()" tabindex="0">
     <div class="btn" style="left: 10px;" onclick="document.querySelector('#frames #gallery').scrollLeft-=100;"><i class="fa fa-chevron-left"></i></div>
@@ -298,7 +307,7 @@ path {
       <span class="item" onclick="board.setmode(4)"><i class="far fa-circle"></i></span>
       <span class="item" onclick="board.setmode(5)"><i class="far fa-circle" style="transform: rotateX(45deg);"></i></span> -->
       <span class="item" onclick="board.undo()"><i class="fas fa-undo"></i></span>
-      <span class="item" onclick="board.uploadImage()"><i class="fas fa-upload"></i></span>
+      <span class="item uploadBtn" onclick="board.uploadImage()"><i class="fas fa-upload"></i></span>
       <!-- <span class="item" onclick="board.redo()"><i class="fas fa-redo"></i></span>
       <span class="item" onclick="board.clear()"><i class="fas fa-trash"></i></span>
       <span class="item" onclick="board.addImage()"><i class="fa fa-upload"></i></span>
@@ -740,6 +749,9 @@ window.onload = function () {
   document.querySelector("#palette").addEventListener("contextmenu",e=>e.preventDefault());
 }
 
+document.querySelector("#cancel").onclick = function () {
+  window.dim.close()
+}
 document.querySelector("#close").onclick = function () {
   var width = +document.querySelector("#width").value;
   var height = +document.querySelector("#height").value;
