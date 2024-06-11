@@ -428,12 +428,40 @@ class Canvas {
       this.active = false;
     });
   }
+
+  drawBoard(){
+
+    // Box width
+    var bw = this.canvas.width;
+    // Box height
+    var bh = this.canvas.height;
+    // Padding
+    var p = 0;
+
+    let pixel_size = 10
+
+
+    for (var x = 0; x <= bw; x += pixel_size) {
+        this.ctx.moveTo(0.5 + x + p, p);
+        this.ctx.lineTo(0.5 + x + p, bh + p);
+    }
+
+    for (var x = 0; x <= bh; x += pixel_size) {
+      this.ctx.moveTo(p, 0.5 + x + p);
+      this.ctx.lineTo(bw + p, 0.5 + x + p);
+    }
+    this.ctx.strokeStyle = "grey";
+    this.ctx.stroke();
+}
+
+  
   draw(x, y, count) {
   	if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
     	this.data[x][y] = this.color;
     	this.ctx.fillRect(Math.floor(x * (this.w / this.width)), Math.floor(y * (this.h / this.height)), Math.floor(this.w / this.width), Math.floor(this.h / this.height));
     	if (!count && JSON.stringify(this.steps[this.steps.length-1])!==JSON.stringify([x,y,this.color,this.ctx.globalAlpha])) this.steps.push([x,y,this.color,this.ctx.globalAlpha]);
-	}
+	  }
+    this.drawBoard()
   }
   erase(x, y){
     var temp = this.color;
@@ -444,7 +472,6 @@ class Canvas {
     this.ctx.globalAlpha = tga;
   }
   setcolor(color) {
-    console.log({setcolor: this.color})
   	this.ctx.globalAlpha = 1;
     this.color = color;
     this.ctx.fillStyle = "rgba(" + color[0] + "," + color[1] + "," + color[2] + "," + color[3] + ")";
@@ -756,7 +783,7 @@ document.querySelector("#close").onclick = function () {
   var width = +document.querySelector("#width").value;
   var height = +document.querySelector("#height").value;
   window.board = new Canvas(width, height);
-  window.board.setcolor([0, 0, 0, 255]);
+  window.board.setcolor([255, 255, 255, 255]);
   window.dim.close();
   window.gif = new GIF({
     workers: 2,
