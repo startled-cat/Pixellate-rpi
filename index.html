@@ -41,7 +41,7 @@
 }
 
 body {
-  background-color: #081949;
+  background-color: #3f3f3f;
   margin: 0px;
 }
 
@@ -154,7 +154,7 @@ body {
   transform: translateY(-50%);
   padding: 0px;
   color: white;
-  max-width: 150px;
+  max-width: 100px;
 }
 
 #toolbar .item {
@@ -176,7 +176,7 @@ body {
   transform: translateY(-50%);
   padding: 0px;
   color: white;
-  max-width: 100px;
+  max-width: 60px;
 }
 
 #palette .item {
@@ -274,7 +274,7 @@ path {
     <div class="menubtn">☰</div>
     <ul class="menu">
       <li onclick="newProject()">New</li>
-      <!-- <li onclick="board.save()">Save image</li> -->
+      <!-- <li onclick="board.save()">Reload</li> -->
       <!-- <li onclick="install()" >Install PWA</li> -->
       <!-- <li><a href="https://github.com/rainboestrykr/pixellate" target="_blank"><i class="fab fa-github"></i>Github</a></li> -->
     </ul>
@@ -294,12 +294,12 @@ path {
       <span class="item" onclick="board.setmode(0)" style="background-color: grey;"><i class="fas fa-pencil-alt"></i></span>
       <span class="item" onclick="board.setmode(1)"><i class="fas fa-eraser"></i></span>
       <span class="item" onclick="board.setmode(2)"><i class="fas fa-fill"></i></span>
-      <span class="item" onclick="board.setmode(3)"><i class="fas fa-slash"></i></span>
+      <!-- <span class="item" onclick="board.setmode(3)"><i class="fas fa-slash"></i></span>
       <span class="item" onclick="board.setmode(4)"><i class="far fa-circle"></i></span>
-      <span class="item" onclick="board.setmode(5)"><i class="far fa-circle" style="transform: rotateX(45deg);"></i></span>
+      <span class="item" onclick="board.setmode(5)"><i class="far fa-circle" style="transform: rotateX(45deg);"></i></span> -->
+      <span class="item" onclick="board.undo()"><i class="fas fa-undo"></i></span>
       <span class="item" onclick="board.uploadImage()"><i class="fas fa-upload"></i></span>
-      <!-- <span class="item" onclick="board.undo()"><i class="fas fa-undo"></i></span>
-      <span class="item" onclick="board.redo()"><i class="fas fa-redo"></i></span>
+      <!-- <span class="item" onclick="board.redo()"><i class="fas fa-redo"></i></span>
       <span class="item" onclick="board.clear()"><i class="fas fa-trash"></i></span>
       <span class="item" onclick="board.addImage()"><i class="fa fa-upload"></i></span>
       <span class="item" onclick="Frames.open()"><i class="fas fa-eye"></i></span> -->
@@ -435,6 +435,7 @@ class Canvas {
     this.ctx.globalAlpha = tga;
   }
   setcolor(color) {
+    console.log({setcolor: this.color})
   	this.ctx.globalAlpha = 1;
     this.color = color;
     this.ctx.fillStyle = "rgba(" + color[0] + "," + color[1] + "," + color[2] + "," + color[3] + ")";
@@ -462,7 +463,7 @@ class Canvas {
     this.ctx.fillStyle = "black";
     this.ctx.fillRect(0, 0, this.w, this.h);
     this.data = [...Array(this.width)].map(e => Array(this.height).fill([0, 0, 0, 255]));
-    this.setcolor(this.color);
+    this.setcolor([255, 255, 255, 255]);
     this.setmode(Tool.pen);
   }
 
@@ -715,7 +716,8 @@ window.onload = function () {
     
     window.board.steps = data.steps;
     window.board.redo_arr = data.redo_arr;
-    window.board.setcolor(data.currColor);
+    window.board.setcolor([255, 255, 255, 255]);
+    // window.board.setcolor(data.currColor);
     window.gif = new GIF({
       workers: 2,
       quality: 10,
@@ -733,7 +735,7 @@ window.onload = function () {
   else {
     newProject();
   }
-  document.querySelector("#palette").innerHTML = colors.map(x => `<span class="item" style="background-color: rgb(${x[0]},${x[1]},${x[2]})" onclick="board.setcolor([${x}]);act(this);" oncontextmenu="board.setcolor([${x}]);act(this);board.ctx.globalAlpha=+prompt('Transparency(0-1)?')"></span>`).join("\n");
+  document.querySelector("#palette").innerHTML = colors.map(x => `<span class="item" style="background-color: rgb(${x[0]},${x[1]},${x[2]})" onclick="board.setcolor([${x}]);act(this);"></span>`).join("\n");
 
   document.querySelector("#palette").addEventListener("contextmenu",e=>e.preventDefault());
 }
@@ -786,7 +788,8 @@ function filler(x, y, cc) {
 
 function act(clr) {
   document.querySelectorAll("#palette .item").forEach(x => x.style.boxShadow = "");
-  clr.style.boxShadow = "10px 10px 10px 10px rgba(0,0,0,0.5)";
+  // clr.style.boxShadow = "10px 10px 10px 10px rgba(0,0,0,0.5)";
+  clr.style.boxShadow = "inset rgb(255 0 0) 0px 0px 0px 5px";
 }
 
 window.onbeforeunload = function () {
